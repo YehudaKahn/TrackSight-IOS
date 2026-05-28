@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var count = 0
+    @State private var isOverlayVisible = true
 
     var body: some View {
         ZStack {
@@ -24,6 +25,23 @@ struct ContentView: View {
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.92))
 
+                Toggle(isOn: $isOverlayVisible) {
+                    Text("Show overlay")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                .toggleStyle(.switch)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.white.opacity(0.10))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.white.opacity(0.14), lineWidth: 1)
+                )
+
                 Button {
                     count += 1
                 } label: {
@@ -45,9 +63,13 @@ struct ContentView: View {
             }
             .padding(32)
 
-            PassthroughOverlay()
-                .allowsHitTesting(false)
+            if isOverlayVisible {
+                PassthroughOverlay()
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.2), value: isOverlayVisible)
     }
 }
 
@@ -55,14 +77,29 @@ private struct PassthroughOverlay: View {
     var body: some View {
         ZStack {
             Rectangle()
-                .fill(.ultraThinMaterial.opacity(0.18))
+                .fill(Color.cyan.opacity(0.16))
                 .ignoresSafeArea()
+
+            Rectangle()
+                .fill(.ultraThinMaterial.opacity(0.55))
+                .ignoresSafeArea()
+
+            LinearGradient(
+                colors: [
+                    Color.clear,
+                    Color.white.opacity(0.06),
+                    Color.clear
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color.cyan.opacity(0.22),
+                            Color.cyan.opacity(0.32),
                             Color.clear
                         ],
                         center: .center,
@@ -95,7 +132,7 @@ private struct PassthroughOverlay: View {
 
                 Spacer()
             }
-            .padding()
+                .padding()
 
             RoundedRectangle(cornerRadius: 36, style: .continuous)
                 .stroke(Color.white.opacity(0.18), lineWidth: 1)
